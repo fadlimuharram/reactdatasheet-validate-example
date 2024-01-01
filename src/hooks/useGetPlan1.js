@@ -4,7 +4,7 @@ import { useQuery } from "react-query";
 const QUERY_KEY = "GET_PLAN_1";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "",
 });
 
 const fetchGetPlan1 = async () => {

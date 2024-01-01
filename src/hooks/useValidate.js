@@ -4,7 +4,7 @@ import { useMutation } from "react-query";
 const QUERY_KEY = "VALIDATE_BY_DATA";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "",
 });
 
 const fetchValdateData = async (body) => {

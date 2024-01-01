@@ -4,7 +4,7 @@ import { useQuery } from "react-query";
 const QUERY_KEY = "GET_BANKS";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "",
 });
 
 const fetchGetBank = async () => {
