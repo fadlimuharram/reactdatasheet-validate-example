@@ -15,7 +15,7 @@ export default function handler(req, res) {
     body.forEach((row) => {
       if ((row.plan1 || row.plan2 || row.plan3) && !row.insuranceProvider) {
         err.push({
-          rowId: err.rowId,
+          rowId: row.rowId,
           column: "insuranceProvider",
           message: "Insurance Provider Required",
         });
