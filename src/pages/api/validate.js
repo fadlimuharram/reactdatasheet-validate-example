@@ -13,7 +13,7 @@ export default function handler(req, res) {
 
   if (body.length > 0) {
     body.forEach((row) => {
-      if (!row.insuranceProvider) {
+      if ((row.plan1 || row.plan2 || row.plan3) && !row.insuranceProvider) {
         err.push({
           rowId: err.rowId,
           column: "insuranceProvider",
