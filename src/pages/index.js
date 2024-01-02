@@ -41,7 +41,7 @@ const Example = () => {
   const [data, setData] = useState([]);
   const [clientErr, setClientErr] = useState([]);
   const [selectedActiveCell, setSelectedActiveCell] = useState(null);
-  const [planCount, setPlanCount] = useState(1);
+
 
   const [columns, setColumns] = useState([
     {
@@ -299,32 +299,33 @@ const Example = () => {
 
   const onAddPlanColumn = () => {
     const arrPlan = [dataPlan1.lists, dataPlan2.lists, dataPlan3.lists];
-    if (planCount > 3) {
-      alert("Maximal 3 Plan");
-      return;
-    }
 
+    const renderPlan = () => {
+      return arrPlan.map((plan, idx)=>{
+        return  {
+          ...keyColumn(`plan${idx + 1}`, {
+            ...CustomSelect({
+              choices: arrPlan[idx],
+            }),
+          }),
+          title: `Plan ${idx + 1}`,
+          minWidth: 200,
+        }
+      })
+    }
+    
     setColumns((prev) => {
       return [
         ...prev,
-        {
-          ...keyColumn(`plan${planCount}`, {
-            ...CustomSelect({
-              choices: arrPlan[planCount - 1],
-            }),
-          }),
-          title: `Plan ${planCount}`,
-          minWidth: 200,
-        },
+        ...renderPlan()
+       ,
       ];
     });
-    setPlanCount((prev) => prev + 1);
+   
   };
 
   useEffect(()=>{
     if(isFetchedPlan1 && isFetchedPlan2 && isFetchedPlan3){
-      onAddPlanColumn()
-      onAddPlanColumn()
       onAddPlanColumn()
     }
   },[isFetchedPlan1, isFetchedPlan2, isFetchedPlan3])
@@ -442,10 +443,6 @@ const Example = () => {
           }}
         />
       </DatePickerWrapper>
-
-      <button type="button" onClick={onAddPlanColumn}>
-        Add Plan
-      </button>
       <hr />
       <pre>
         {`Client Validation => email`} <br />
