@@ -30,11 +30,13 @@ const validateEmail = (email) => {
 
 const Example = () => {
   const { mutate, data: dataResponse } = useValidateData();
+
   const { data: dataBank, isFetched: isFetchedBank } = useGetBankLists();
   const { data: dataInsurance, isFetched: isFetchedInsurance } = useInsurance();
-  const { data: dataPlan1 } = usePlan1();
-  const { data: dataPlan2 } = usePlan2();
-  const { data: dataPlan3 } = usePlan3();
+  const { data: dataPlan1, isFetched: isFetchedPlan1 } = usePlan1();
+  const { data: dataPlan2, isFetched: isFetchedPlan2 } = usePlan2();
+  const { data: dataPlan3, isFetched: isFetchedPlan3 } = usePlan3();
+  const [listsEmployee, setListsEmployee] = useState([]);
 
   const [data, setData] = useState([]);
   const [clientErr, setClientErr] = useState([]);
@@ -42,10 +44,43 @@ const Example = () => {
   const [planCount, setPlanCount] = useState(1);
 
   const [columns, setColumns] = useState([
-    { ...keyColumn("memberName", textColumn), title: "Member Name" },
-    { ...keyColumn("relation", textColumn), title: "Relation" },
-    { ...keyColumn("employeeName", textColumn), title: "Employee name" },
-    { ...keyColumn("bod", { ...CustomDatePicker() }), title: "Birth Date" },
+    {
+      ...keyColumn("memberName", textColumn),
+      title: "Member Name",
+      minWidth: 200,
+    },
+    {
+      ...keyColumn("relation", {
+        ...CustomSelect({
+          choices: [
+            {
+              value: "EMPLOYEE",
+              label: "EMPLOYEE",
+            },
+            {
+              value: "SPOUSE",
+              label: "SPOUSE",
+            },
+            {
+              value: "CHILDREN",
+              label: "CHILDREN",
+            },
+          ],
+        }),
+      }),
+      title: "Relation",
+      minWidth: 200,
+    },
+    {
+      ...keyColumn("employeeName", textColumn),
+      title: "Employee name",
+      minWidth: 200,
+    },
+    {
+      ...keyColumn("bod", { ...CustomDatePicker() }),
+      title: "Birth Date",
+      minWidth: 200,
+    },
     {
       ...keyColumn("gender", {
         ...CustomSelect({
@@ -62,6 +97,7 @@ const Example = () => {
         }),
       }),
       title: "Gender",
+      minWidth: 200,
     },
     {
       ...keyColumn("maritalStatus", {
@@ -79,6 +115,7 @@ const Example = () => {
         }),
       }),
       title: "Marital Status",
+      minWidth: 200,
     },
     {
       ...keyColumn("bank", {
@@ -87,21 +124,43 @@ const Example = () => {
         }),
       }),
       title: "Bank",
+      minWidth: 200,
     },
-    { ...keyColumn("bankBranch", textColumn), title: "Bank Branch" },
+    {
+      ...keyColumn("bankBranch", textColumn),
+      title: "Bank Branch",
+      minWidth: 200,
+    },
     {
       ...keyColumn("bankAccountNumber", textColumn),
       title: "Bank Account Number",
+      minWidth: 200,
     },
-    { ...keyColumn("email", textColumn), title: "Email" },
-    { ...keyColumn("phoneNumber", textColumn), title: "Phone Number" },
-    { ...keyColumn("nik", textColumn), title: "NIK" },
-    { ...keyColumn("fullAddress", textColumn), title: "Full Address" },
-    { ...keyColumn("employeeId", textColumn), title: "Employee ID" },
-    { ...keyColumn("departement", textColumn), title: "Departement" },
-    { ...keyColumn("jobLevel", textColumn), title: "Job Level" },
-    { ...keyColumn("jobTitle", textColumn), title: "Job Title" },
-    { ...keyColumn("notes", textColumn), title: "Notes" },
+    { ...keyColumn("email", textColumn), title: "Email", minWidth: 200 },
+    {
+      ...keyColumn("phoneNumber", textColumn),
+      title: "Phone Number",
+      minWidth: 200,
+    },
+    { ...keyColumn("nik", textColumn), title: "NIK", minWidth: 200 },
+    {
+      ...keyColumn("fullAddress", textColumn),
+      title: "Full Address",
+      minWidth: 200,
+    },
+    {
+      ...keyColumn("employeeId", textColumn),
+      title: "Employee ID",
+      minWidth: 200,
+    },
+    {
+      ...keyColumn("departement", textColumn),
+      title: "Departement",
+      minWidth: 200,
+    },
+    { ...keyColumn("jobLevel", textColumn), title: "Job Level", minWidth: 200 },
+    { ...keyColumn("jobTitle", textColumn), title: "Job Title", minWidth: 200 },
+    { ...keyColumn("notes", textColumn), title: "Notes", minWidth: 200 },
     {
       ...keyColumn("insuranceProvider", {
         ...CustomSelect({
@@ -110,6 +169,7 @@ const Example = () => {
       }),
 
       title: "Provider",
+      minWidth: 200,
     },
     // {
     //   ...keyColumn("plan", {
@@ -122,17 +182,13 @@ const Example = () => {
     // },
   ]);
 
-
-
   useEffect(() => {
     if (isFetchedBank && dataBank.lists.length > 0) {
       const selectBank = dataBank.lists.map((bank) => {
         return { value: bank.id, label: bank.name };
       });
 
-      
       setColumns((prev) => {
-        
         return prev.map((v) => {
           if (v.id === "bank") {
             return {
@@ -142,6 +198,7 @@ const Example = () => {
                 }),
               }),
               title: "Bank",
+              minWidth: 200,
             };
           } else {
             return v;
@@ -150,6 +207,45 @@ const Example = () => {
       });
     }
   }, [dataBank, isFetchedBank]);
+
+  useEffect(() => {
+    if (data) {
+      const mappingEmployeeName = [];
+      data.forEach((row) => {
+        if (row.relation === "EMPLOYEE") {
+          mappingEmployeeName.push({
+            value: row.memberName,
+            label: row.memberName,
+          });
+        }
+      });
+
+      setListsEmployee(mappingEmployeeName);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (listsEmployee.length > 0) {
+      console.log("listsEmployee", listsEmployee);
+      setColumns((prevCol) => {
+        return prevCol.map((col) => {
+          if (col.id === "employeeName") {
+            return {
+              ...keyColumn("employeeName", {
+                ...CustomSelect({
+                  choices: listsEmployee,
+                }),
+              }),
+              title: "Relation",
+              minWidth: 200,
+            };
+          }
+
+          return col;
+        });
+      });
+    }
+  }, [listsEmployee]);
 
   useEffect(() => {
     if (isFetchedInsurance && dataInsurance.lists.length > 0) {
@@ -163,6 +259,7 @@ const Example = () => {
                 }),
               }),
               title: "Insurance Provider",
+              minWidth: 200,
             };
           } else {
             return v;
@@ -217,11 +314,20 @@ const Example = () => {
             }),
           }),
           title: `Plan ${planCount}`,
+          minWidth: 200,
         },
       ];
     });
     setPlanCount((prev) => prev + 1);
   };
+
+  useEffect(()=>{
+    if(isFetchedPlan1 && isFetchedPlan2 && isFetchedPlan3){
+      onAddPlanColumn()
+      onAddPlanColumn()
+      onAddPlanColumn()
+    }
+  },[isFetchedPlan1, isFetchedPlan2, isFetchedPlan3])
 
   const genId = () => {
     return _.uniqueId();
@@ -270,15 +376,9 @@ const Example = () => {
   };
 
   const onChange = (value) => {
-
     const getListColumns = columns.map((col) => col.id);
 
-    const changeVal = _.differenceBy(
-      value,
-      data,
-      getListColumns
-    );
- 
+    const changeVal = _.differenceBy(value, data, getListColumns);
 
     let isAnyValue = false;
     _.each(changeVal, (val, key) => {
@@ -288,7 +388,6 @@ const Example = () => {
         }
       });
     });
-
 
     if (isAnyValue && onValidateClient(value)) {
       mutate(changeVal);

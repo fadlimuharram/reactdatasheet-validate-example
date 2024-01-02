@@ -1,5 +1,26 @@
 import React, { useRef, useLayoutEffect } from "react";
 import Select from "react-select";
+import { FixedSizeList as List } from "react-window";
+
+const height = 50;
+
+const MenuList = (props) => {
+  console.log("debug props", props);
+  const { options, children, maxHeight, getValue } = props;
+  const [value] = getValue();
+  const initialOffset = options.indexOf(value) * height;
+
+  return (
+    <List
+      height={maxHeight}
+      itemCount={children.length}
+      itemSize={height}
+      initialScrollOffset={initialOffset}
+    >
+      {({ index, style }) => <div style={style}>{children[index]}</div>}
+    </List>
+  );
+};
 
 const SelectComponent = ({
   active,
@@ -77,6 +98,7 @@ const SelectComponent = ({
       }}
       onMenuClose={() => stopEditing({ nextRow: false })}
       options={renderOptions()}
+      components={{ MenuList }}
     />
   );
 };
