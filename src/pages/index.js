@@ -236,7 +236,7 @@ const Example = () => {
                   choices: listsEmployee,
                 }),
               }),
-              title: "Relation",
+              title: "Employee name",
               minWidth: 200,
             };
           }
