@@ -29,19 +29,91 @@ const validateEmail = (email) => {
 };
 
 const Example = () => {
-  const { mutate, data: dataResponse } = useValidateData();
+ 
 
   const { data: dataBank, isFetched: isFetchedBank } = useGetBankLists();
   const { data: dataInsurance, isFetched: isFetchedInsurance } = useInsurance();
   const { data: dataPlan1, isFetched: isFetchedPlan1 } = usePlan1();
   const { data: dataPlan2, isFetched: isFetchedPlan2 } = usePlan2();
   const { data: dataPlan3, isFetched: isFetchedPlan3 } = usePlan3();
+  const [validateBody, setValidateBody] = useState(undefined);
+  const [errorCell, setErrorCell] = useState([]);
   const [listsEmployee, setListsEmployee] = useState([]);
+
+  console.log("matchErrorWithResponse errorCell", errorCell);
 
   const [data, setData] = useState([]);
   const [clientErr, setClientErr] = useState([]);
   const [selectedActiveCell, setSelectedActiveCell] = useState(null);
 
+  const { mutate } = useValidateData({onSuccess:(dataResponse)=>{
+    let toastServerError = "";
+    console.log('matchErrorWithResponse data', dataResponse)
+
+    // const matchErrorWithResponse = validateBody.filter((v)=>{
+    //   return dataResponse.errors.includes({rowId: v.rowId})
+    // })
+
+    // const validBody = [];
+
+    // validateBody.forEach((body, key) => {
+    //   // console.log("matchErrorWithResponse 1", key);
+    //   Object.keys(body).forEach((bodyKey) => {
+    //     const findInErrors = dataResponse.errors.find((err) => {
+    //       return err.rowId === body.rowId && err.column === bodyKey;
+    //     });
+
+    //     if (!findInErrors)
+    //       validBody.push({ rowId: body.rowId, column: bodyKey });
+    //   });
+    //   // dataResponse.errors.forEach((err) => {
+    //   //   if (err.rowId === body.rowId) {
+
+    //   //     // if (!err.column && body[err.column]) {
+    //   //     //   validBody.push(err);
+    //   //     // }
+    //   //   }
+    //   // });
+    // });
+
+    setErrorCell((prev) => {
+      // console.log("matchErrorWithResponse 1", prev);
+      // console.log("matchErrorWithResponse 2", validateBody);
+      // console.log("matchErrorWithResponse 3", dataResponse.errors);
+      // console.log("matchErrorWithResponse 4", validBody);
+      // const filterPrev = prev;
+      // prev.forEach((val, idx) => {
+      //   validBody.forEach((vBody) => {
+      //     if (val.rowId === vBody.rowId && vBody.column === val.column) {
+      //       console.log("matchErrorWithResponse 5 filterPrev found", vBody);
+      //       filterPrev.splice(idx, 1);
+      //     }
+      //   });
+      // });
+      // console.log("matchErrorWithResponse 5 filterPrev", filterPrev);
+      const filterPrev = prev
+
+      prev.forEach((v,idx)=>{
+        const findByRowId = dataResponse.bodyRequest.find((bodyReq)=>{
+          return bodyReq.rowId === v.rowId
+        })
+
+        if(findByRowId ){
+          filterPrev.splice(idx, 1)
+        }
+      })
+
+      return [...filterPrev, ...dataResponse.errors];
+    });
+
+    dataResponse.errors.forEach((err) => {
+      const findRowNo = data.findIndex((row) => row.rowId === err.rowId);
+
+      toastServerError += `${err.message} at Row ${findRowNo + 1} \n`;
+    });
+
+    toast.error(toastServerError);
+  }});
 
   const [columns, setColumns] = useState([
     {
@@ -283,26 +355,68 @@ const Example = () => {
     }
   }, [clientErr, toast]);
 
-  useEffect(() => {
-    if (dataResponse && dataResponse.errors.length > 0) {
-      let toastServerError = "";
+  // useEffect(() => {
+  //   if (dataResponse && dataResponse.errors.length > 0) {
+  //     let toastServerError = "";
 
-      dataResponse.errors.forEach((err) => {
-        const findRowNo = data.findIndex((row) => row.rowId === err.rowId);
+  //     // const matchErrorWithResponse = validateBody.filter((v)=>{
+  //     //   return dataResponse.errors.includes({rowId: v.rowId})
+  //     // })
 
-        toastServerError += `${err.message} at Row ${findRowNo + 1} \n`;
-      });
+  //     const validBody = [];
 
-      toast.error(toastServerError);
-    }
-  }, [dataResponse, toast]);
+  //     validateBody.forEach((body, key) => {
+  //       console.log("matchErrorWithResponse 1", key);
+  //       Object.keys(body).forEach((bodyKey) => {
+  //         const findInErrors = dataResponse.errors.find((err) => {
+  //           return err.rowId === body.rowId && err.column === bodyKey;
+  //         });
+
+  //         if (!findInErrors)
+  //           validBody.push({ rowId: body.rowId, column: bodyKey });
+  //       });
+  //       // dataResponse.errors.forEach((err) => {
+  //       //   if (err.rowId === body.rowId) {
+
+  //       //     // if (!err.column && body[err.column]) {
+  //       //     //   validBody.push(err);
+  //       //     // }
+  //       //   }
+  //       // });
+  //     });
+
+  //     setErrorCell((prev) => {
+  //       console.log("matchErrorWithResponse 1", prev);
+  //       console.log("matchErrorWithResponse 2", validateBody);
+  //       console.log("matchErrorWithResponse 3", dataResponse.errors);
+  //       console.log("matchErrorWithResponse 4", validBody);
+  //       const filterPrev = prev;
+  //       prev.forEach((val, idx) => {
+  //         validBody.forEach((vBody) => {
+  //           if (val.rowId === vBody.rowId && vBody.column === val.column) {
+  //             filterPrev.splice(idx, 1);
+  //           }
+  //         });
+  //       });
+  //       return [...filterPrev, ...dataResponse.errors];
+  //     });
+
+  //     dataResponse.errors.forEach((err) => {
+  //       const findRowNo = data.findIndex((row) => row.rowId === err.rowId);
+
+  //       toastServerError += `${err.message} at Row ${findRowNo + 1} \n`;
+  //     });
+
+  //     toast.error(toastServerError);
+  //   }
+  // }, [dataResponse, toast, validateBody]);
 
   const onAddPlanColumn = () => {
     const arrPlan = [dataPlan1.lists, dataPlan2.lists, dataPlan3.lists];
 
     const renderPlan = () => {
-      return arrPlan.map((plan, idx)=>{
-        return  {
+      return arrPlan.map((plan, idx) => {
+        return {
           ...keyColumn(`plan${idx + 1}`, {
             ...CustomSelect({
               choices: arrPlan[idx],
@@ -310,25 +424,20 @@ const Example = () => {
           }),
           title: `Plan ${idx + 1}`,
           minWidth: 200,
-        }
-      })
-    }
-    
+        };
+      });
+    };
+
     setColumns((prev) => {
-      return [
-        ...prev,
-        ...renderPlan()
-       ,
-      ];
+      return [...prev, ...renderPlan()];
     });
-   
   };
 
-  useEffect(()=>{
-    if(isFetchedPlan1 && isFetchedPlan2 && isFetchedPlan3){
-      onAddPlanColumn()
+  useEffect(() => {
+    if (isFetchedPlan1 && isFetchedPlan2 && isFetchedPlan3) {
+      onAddPlanColumn();
     }
-  },[isFetchedPlan1, isFetchedPlan2, isFetchedPlan3])
+  }, [isFetchedPlan1, isFetchedPlan2, isFetchedPlan3]);
 
   const genId = () => {
     return _.uniqueId();
@@ -336,8 +445,16 @@ const Example = () => {
 
   const hasError = (opt) => {
     let isError = false;
-    if (dataResponse && dataResponse.errors && dataResponse.errors.length > 0) {
-      dataResponse.errors.find((err) => {
+    // if (dataResponse && dataResponse.errors && dataResponse.errors.length > 0) {
+    //   dataResponse.errors.find((err) => {
+    //     if (err.rowId === opt.rowData.rowId && err.column === opt.columnId) {
+    //       isError = true;
+    //     }
+    //   });
+    // }
+
+    if (errorCell && errorCell && errorCell.length > 0) {
+      errorCell.find((err) => {
         if (err.rowId === opt.rowData.rowId && err.column === opt.columnId) {
           isError = true;
         }
@@ -391,6 +508,7 @@ const Example = () => {
     });
 
     if (isAnyValue && onValidateClient(value)) {
+      setValidateBody(changeVal);
       mutate(changeVal);
     }
 

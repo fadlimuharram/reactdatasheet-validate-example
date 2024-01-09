@@ -10,7 +10,7 @@ const api = axios.create({
 const fetchValdateData = async (body) => {
   try {
     const { data } = await api.post(`/api/validate`, {
-      body
+      body,
     });
     return data;
   } catch (err) {
@@ -18,6 +18,6 @@ const fetchValdateData = async (body) => {
   }
 };
 
-export function useValidateData() {
-  return useMutation((payload) => fetchValdateData(payload));
+export function useValidateData({ onSuccess }) {
+  return useMutation((payload) => fetchValdateData(payload), { onSuccess });
 }

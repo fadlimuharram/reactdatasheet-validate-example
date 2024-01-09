@@ -49,10 +49,12 @@ export default function handler(req, res) {
 
     res.status(200).json({
       errors: err,
+      bodyRequest: body
     });
   } else {
     res.status(200).json({
       errors: [],
+      bodyRequest: body
     });
   }
 }
