@@ -3,6 +3,7 @@ import QueryClientProvider from "../providers/ReactQuery";
 import { Toaster } from "react-hot-toast";
 
 import "@/styles/globals.css";
+import "@silevis/reactgrid/styles.css";
 
 export default function App({ Component, pageProps }) {
   return (

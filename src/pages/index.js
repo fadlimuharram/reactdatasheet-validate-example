@@ -29,8 +29,6 @@ const validateEmail = (email) => {
 };
 
 const Example = () => {
- 
-
   const { data: dataBank, isFetched: isFetchedBank } = useGetBankLists();
   const { data: dataInsurance, isFetched: isFetchedInsurance } = useInsurance();
   const { data: dataPlan1, isFetched: isFetchedPlan1 } = usePlan1();
@@ -46,74 +44,76 @@ const Example = () => {
   const [clientErr, setClientErr] = useState([]);
   const [selectedActiveCell, setSelectedActiveCell] = useState(null);
 
-  const { mutate } = useValidateData({onSuccess:(dataResponse)=>{
-    let toastServerError = "";
-    console.log('matchErrorWithResponse data', dataResponse)
+  const { mutate } = useValidateData({
+    onSuccess: (dataResponse) => {
+      let toastServerError = "";
+      console.log("matchErrorWithResponse data", dataResponse);
 
-    // const matchErrorWithResponse = validateBody.filter((v)=>{
-    //   return dataResponse.errors.includes({rowId: v.rowId})
-    // })
+      // const matchErrorWithResponse = validateBody.filter((v)=>{
+      //   return dataResponse.errors.includes({rowId: v.rowId})
+      // })
 
-    // const validBody = [];
+      // const validBody = [];
 
-    // validateBody.forEach((body, key) => {
-    //   // console.log("matchErrorWithResponse 1", key);
-    //   Object.keys(body).forEach((bodyKey) => {
-    //     const findInErrors = dataResponse.errors.find((err) => {
-    //       return err.rowId === body.rowId && err.column === bodyKey;
-    //     });
+      // validateBody.forEach((body, key) => {
+      //   // console.log("matchErrorWithResponse 1", key);
+      //   Object.keys(body).forEach((bodyKey) => {
+      //     const findInErrors = dataResponse.errors.find((err) => {
+      //       return err.rowId === body.rowId && err.column === bodyKey;
+      //     });
 
-    //     if (!findInErrors)
-    //       validBody.push({ rowId: body.rowId, column: bodyKey });
-    //   });
-    //   // dataResponse.errors.forEach((err) => {
-    //   //   if (err.rowId === body.rowId) {
-
-    //   //     // if (!err.column && body[err.column]) {
-    //   //     //   validBody.push(err);
-    //   //     // }
-    //   //   }
-    //   // });
-    // });
-
-    setErrorCell((prev) => {
-      // console.log("matchErrorWithResponse 1", prev);
-      // console.log("matchErrorWithResponse 2", validateBody);
-      // console.log("matchErrorWithResponse 3", dataResponse.errors);
-      // console.log("matchErrorWithResponse 4", validBody);
-      // const filterPrev = prev;
-      // prev.forEach((val, idx) => {
-      //   validBody.forEach((vBody) => {
-      //     if (val.rowId === vBody.rowId && vBody.column === val.column) {
-      //       console.log("matchErrorWithResponse 5 filterPrev found", vBody);
-      //       filterPrev.splice(idx, 1);
-      //     }
+      //     if (!findInErrors)
+      //       validBody.push({ rowId: body.rowId, column: bodyKey });
       //   });
+      //   // dataResponse.errors.forEach((err) => {
+      //   //   if (err.rowId === body.rowId) {
+
+      //   //     // if (!err.column && body[err.column]) {
+      //   //     //   validBody.push(err);
+      //   //     // }
+      //   //   }
+      //   // });
       // });
-      // console.log("matchErrorWithResponse 5 filterPrev", filterPrev);
-      const filterPrev = prev
 
-      prev.forEach((v,idx)=>{
-        const findByRowId = dataResponse.bodyRequest.find((bodyReq)=>{
-          return bodyReq.rowId === v.rowId
-        })
+      setErrorCell((prev) => {
+        // console.log("matchErrorWithResponse 1", prev);
+        // console.log("matchErrorWithResponse 2", validateBody);
+        // console.log("matchErrorWithResponse 3", dataResponse.errors);
+        // console.log("matchErrorWithResponse 4", validBody);
+        // const filterPrev = prev;
+        // prev.forEach((val, idx) => {
+        //   validBody.forEach((vBody) => {
+        //     if (val.rowId === vBody.rowId && vBody.column === val.column) {
+        //       console.log("matchErrorWithResponse 5 filterPrev found", vBody);
+        //       filterPrev.splice(idx, 1);
+        //     }
+        //   });
+        // });
+        // console.log("matchErrorWithResponse 5 filterPrev", filterPrev);
+        const filterPrev = prev;
 
-        if(findByRowId ){
-          filterPrev.splice(idx, 1)
-        }
-      })
+        prev.forEach((v, idx) => {
+          const findByRowId = dataResponse.bodyRequest.find((bodyReq) => {
+            return bodyReq.rowId === v.rowId;
+          });
 
-      return [...filterPrev, ...dataResponse.errors];
-    });
+          if (findByRowId) {
+            filterPrev.splice(idx, 1);
+          }
+        });
 
-    dataResponse.errors.forEach((err) => {
-      const findRowNo = data.findIndex((row) => row.rowId === err.rowId);
+        return [...filterPrev, ...dataResponse.errors];
+      });
 
-      toastServerError += `${err.message} at Row ${findRowNo + 1} \n`;
-    });
+      dataResponse.errors.forEach((err) => {
+        const findRowNo = data.findIndex((row) => row.rowId === err.rowId);
 
-    toast.error(toastServerError);
-  }});
+        toastServerError += `${err.message} at Row ${findRowNo + 1} \n`;
+      });
+
+      toast.error(toastServerError);
+    },
+  });
 
   const [columns, setColumns] = useState([
     {
